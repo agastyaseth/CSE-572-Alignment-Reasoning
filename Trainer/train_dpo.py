@@ -3,6 +3,9 @@ from datasets import load_dataset
 from trl import DPOConfig, DPOTrainer
 from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments
 
+from huggingface_hub import login
+login()
+
 # Load model and tokenizer
 model_name = "meta-llama/Llama-3.1-8B-Instruct"
 model = AutoModelForCausalLM.from_pretrained(model_name)
