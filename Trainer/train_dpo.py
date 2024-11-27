@@ -3,14 +3,16 @@ from datasets import load_dataset
 from trl import DPOConfig, DPOTrainer
 from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments
 
-# Load model and tokenizer
-model_name = "meta-llama/Llama-3.1-8B-Instruct"
-model = AutoModelForCausalLM.from_pretrained(model_name)
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-
 # Load dataset
 dataset_name = "vincentmin/eli5_rlhf_explainlikeim5"
-train_dataset = load_dataset(dataset_name, split="train")
+train_dataset = load_dataset(dataset_name, split="train", data_files='data/rl/train-00000-of-00001.parquet')
+print("Loaded train dataset:", train_dataset)
+
+# Load model and tokenizer
+model_name = "meta-llama/Llama-3.1-8B-Instruct"
+model = AutoModelForCausalLM.from_pretrained(model_name, device_map='auto')
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer.pad_token = tokenizer.eos_token
 
 # Tokenize the dataset
 def tokenize_function(examples):
@@ -50,8 +52,9 @@ train_dataset.set_format(
 )
 
 # Define training arguments
-training_args = TrainingArguments(
+training_args = DPOConfig(
     output_dir="./Llama-3.1-8B-DPO",
+    beta=0.1,  # Regularization strength
     per_device_train_batch_size=4,
     gradient_accumulation_steps=4,
     num_train_epochs=3,
@@ -80,8 +83,13 @@ trainer = DPOTrainer(
     args=training_args,
     tokenizer=tokenizer,
     train_dataset=train_dataset,
-    config=dpo_config,
+#     output_dir="./Llama-3.1-8B-DPO",
+#     beta=0.1,  # Regularization strength
+#     # training_args=dpo_config,
 )
 
 # Train the model
 trainer.train()
+
+# Save the model
+trainer.save_model("./Llama-3.1-8B-DPO")

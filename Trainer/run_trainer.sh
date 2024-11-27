@@ -23,7 +23,7 @@ then
 fi
 
 # Number of GPUs to use
-NUM_GPUS=4  # Adjust this based on available GPUs
+NUM_GPUS=1  # Adjust this based on available GPUs
 
 # Launch training with accelerate
 accelerate launch --multi_gpu --num_processes $NUM_GPUS train_dpo.py
