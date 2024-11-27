@@ -3,6 +3,9 @@ from datasets import load_dataset
 from trl import DPOConfig, DPOTrainer
 from transformers import AutoModelForCausalLM, AutoTokenizer, TrainingArguments
 
+from huggingface_hub import login
+login()
+
 # Load dataset
 dataset_name = "vincentmin/eli5_rlhf_explainlikeim5"
 train_dataset = load_dataset(dataset_name, split="train", data_files='data/rl/train-00000-of-00001.parquet')
@@ -90,6 +93,7 @@ trainer = DPOTrainer(
 
 # Train the model
 trainer.train()
+<<<<<<< HEAD
 
 # Save the model
 trainer.save_model("./Llama-3.1-8B-DPO")
